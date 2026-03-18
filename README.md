@@ -1,2 +1,59 @@
 # BD-de-una-nomina-de-pago-SQL
 esta es una base de datos donde muestra una nomina de pago de una empresa, donde esta tiene todas las descripciones de los trabajadores y sus pagos
+USE [nomina_de_pago]
+GO
+/****** Object:  Database [nomina_de_pago_]    Script Date: 18/3/2026 6:13:01 p. m. ******/
+CREATE DATABASE [nomina_de_pago_]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'nomina_de_pago_', FILENAME = N'C:\Users\Jhanuel Vilomar\nomina_de_pago_.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'nomina_de_pago__log', FILENAME = N'C:\Users\Jhanuel Vilomar\nomina_de_pago__log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+ 
+GO
+/****** Object:  Table [dbo].[pagos]    Script Date: 18/3/2026 6:13:02 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[pagos](
+	[id_pagos] [int] IDENTITY(1,1) NOT NULL,
+	[trabajador_id] [int] NULL,
+	[nombre] [varchar](20) NULL,
+	[pago_x_hora] [decimal](10, 2) NULL,
+	[horas_trabajadas] [int] NULL,
+	[horas_extras] [int] NULL,
+	[pago_x_horas_extras] [decimal](10, 2) NULL,
+	[afp] [decimal](10, 2) NULL,
+	[imp_ren] [decimal](10, 2) NULL,
+	[deduciones_totales]  AS ([afp]+[imp_ren]),
+	[sueldo_neto]  AS (([pago_x_hora]*[horas_trabajadas]+[horas_extras]*[pago_x_horas_extras])-([afp]+[imp_ren]))
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[trabajadores]    Script Date: 18/3/2026 6:13:02 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[trabajadores](
+	[trabajador_id] [int] NOT NULL,
+	[nombre] [varchar](100) NULL,
+	[apellido] [varchar](100) NULL,
+	[puesto] [varchar](50) NULL,
+	[turno] [varchar](30) NULL,
+	[salario] [decimal](10, 2) NULL,
+	[fecha_contratacion] [date] NULL,
+ CONSTRAINT [PK_trabajadores] PRIMARY KEY CLUSTERED 
+(
+	[trabajador_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[pagos]  WITH CHECK ADD FOREIGN KEY([trabajador_id])
+REFERENCES [dbo].[trabajadores] ([trabajador_id])
+GO
+USE [master]
+GO
+ALTER DATABASE [nomina_de_pago_] SET  READ_WRITE 
+GO
+
